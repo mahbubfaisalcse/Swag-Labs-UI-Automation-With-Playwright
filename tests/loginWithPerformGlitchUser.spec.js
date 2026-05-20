@@ -34,13 +34,21 @@ test.describe("Add items to cart with performance glitch user", () => {
         await checkout.enterLastName("Doe");
         await checkout.enterPostalCode("12345");
         await checkout.clickButton("Continue");
-        await expect(page.locator('[class="title"]')).toHaveText("Checkout: Overview");
+        
+        const actualProducts = await page.locator('.inventory_item_name').allTextContents();
+        const expectedProducts = [
+        'Test.allTheThings() T-Shirt (Red)'
+        ];
+        await expect(actualProducts).toEqual(expectedProducts);
+        await expect(page.locator('.summary_total_label')).toHaveText('Total: $17.27');
+
         await checkout.clickButton("Finish");
         await expect(page.locator('[class="title"]')).toHaveText("Checkout: Complete!");
         await checkout.clickButton("Back Home");
         await expect(page.locator('[class="title"]')).toHaveText("Products");
 
         await home.clickButton("Open Menu");
+        await home.clickLink("Reset App State");
         await home.clickLink("Logout");
 
     });

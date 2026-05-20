@@ -25,9 +25,10 @@ test.describe("Add items to cart with standard user", () => {
         await home.clickLink("Reset App State");
         await home.clickButton("Close Menu");
 
-        await home.clickButton("Sauce Labs Backpack");
-        await home.clickButton("Sauce Labs Bike Light");
-        await home.clickButton("Sauce Labs Bolt T-Shirt");
+        await home.clickSauceLabsBackpack();
+        await home.clickSauceLabsBikeLight();
+        await home.clickSauceLabsBoltTShirt();
+
         await home.clickCartButton();
         await expect(page.locator('[class="title"]')).toHaveText("Your Cart");
         await checkout.clickButton("Checkout");
@@ -35,9 +36,26 @@ test.describe("Add items to cart with standard user", () => {
         await checkout.enterLastName("Doe");
         await checkout.enterPostalCode("12345");
         await checkout.clickButton("Continue");
-        await expect(page.locator('[class="title"]')).toHaveText("Checkout: Overview");
+        
+        const actualProducts = await page.locator('.inventory_item_name').allTextContents();
+        const expectedProducts = [
+        'Sauce Labs Backpack',
+        'Sauce Labs Bike Light',
+        'Sauce Labs Bolt T-Shirt'
+        ];
+
+        await expect(actualProducts).toEqual(expectedProducts);
+        await expect(page.locator('.summary_total_label'))
+        .toHaveText('Total: $60.45');
+
         await checkout.clickButton("Finish");
         await expect(page.locator('[class="title"]')).toHaveText("Checkout: Complete!");
+        await checkout.clickButton("Back Home");
+        await expect(page.locator('[class="title"]')).toHaveText("Products");
+
+        await home.clickButton("Open Menu");
+        await home.clickLink("Reset App State");
+        await home.clickLink("Logout");
 
     });
  
